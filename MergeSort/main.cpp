@@ -29,26 +29,24 @@
 using namespace std;
 
 /**
- * @brief 归并排序（递归接口）
+ * @brief 合并两个有序数组：data[begin, mid) 和 data[mid, end)
  * 
- * @param data 待排序数组
- * @param begin 数组的左边界（包含）
- * @param end 数组的右边界（不包含）
+ * 归并排序的核心操作：
+ * 
+ * 将两个小段有序序列分别从头开始遍历比较，按序写到新序列中，
+ * 遍历完毕后，新序列也是有序的了。
+ * 
+ * 注意：
+ * 这里的实现是拷贝这两个小段有序数组，而直接原地修改原数组，
+ * 因而请特别注意小段数组与原数组的遍历索引的区别！
+ * 
+ * @param data 原数组（待排序）
+ * @param begin 第一个有序数组的左边界在原数组中的索引
+ * @param mid 第一个有序数组的右边界（第二个有序数组的左边界）在原数组中的索引
+ * @param end 第二个有序数组的右边界在原数组中的索引
  */
-void mergeSort(vector<int>& data, int begin, int end)
+void merge(vector<int>& data, int begin, int mid, int end)
 {
-    // 递归结束条件
-    if (begin >= end - 1) return;
-
-    // 单层递归逻辑：先递后归（在归的过程中合并），类似二叉树的后序遍历
-    
-    // 先递
-    int mid = (begin + end) / 2;
-    mergeSort(data, begin, mid);  // [begin, mid)
-    mergeSort(data, mid, end);   // [mid, end)
-    
-    // 再归（并）
-    // 把两个小段有序序列 [begin, mid) + [mid, end) 合并为一段有序序列
     vector<int> seg1(data.begin() + begin, data.begin() + mid);
     vector<int> seg2(data.begin() + mid, data.begin() + end);
 
@@ -70,6 +68,30 @@ void mergeSort(vector<int>& data, int begin, int end)
     {
         data[data_index++] = seg2[seg2_index++];
     } 
+}
+
+/**
+ * @brief 归并排序（递归接口）
+ * 
+ * @param data 待排序数组
+ * @param begin 数组的左边界（包含）
+ * @param end 数组的右边界（不包含）
+ */
+void mergeSort(vector<int>& data, int begin, int end)
+{
+    // 递归结束条件
+    if (begin >= end - 1) return;
+
+    // 单层递归逻辑：先递后归（在归的过程中合并），类似二叉树的后序遍历
+    
+    // 先递
+    int mid = begin + (end - begin) / 2;  // Do Not "= (begin + end) / 2" to avoid integer overflow
+    mergeSort(data, begin, mid);  // [begin, mid)
+    mergeSort(data, mid, end);   // [mid, end)
+    
+    // 再归（并）
+    // 把两个小段有序序列 [begin, mid) + [mid, end) 合并为一段有序序列
+    merge(data, begin, mid, end);
     
     // 单层递归逻辑完毕，返回上一层递归
 }
